@@ -1,0 +1,29 @@
+{
+  "name": "cordova-plugin-trackingio",
+  "version": "1.0.0",
+  "description": "热云SDK (A cordova plugin for trackingIO2.0 SDK)",
+  "cordova": {
+    "id": "cordova-plugin-trackingio",
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tadazly/cordova-plugin-trackingio.git"
+  },
+  "keywords": [
+    "cordova",
+    "tpns",
+    "sdk",
+    "ecosystem:cordova",
+    "cordova-ios"
+  ],
+  "author": "tadazly",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/tadazly/cordova-plugin-trackingio/issues"
+  },
+  "homepage": "https://github.com/tadazly/cordova-plugin-trackingio#readme",
+  "types": "./types/index.d.ts"
+}

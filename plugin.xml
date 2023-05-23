@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="cordova-plugin-trackingio" version="1.0.0">
+    <name>TrackingIOCordovaPlugin</name>
+    <description>TrackingIO2.0 Cordova Plugin</description>
+    <license>Apache 2.0</license>
+    <keywords>cordova,TrackingIO,reyun,sdk</keywords>
+    <repo>https://github.com/tadazly/cordova-plugin-trackingio.git</repo>
+
+    <preference name="TRACKINGIO_APPKEY" />
+
+    <js-module src="www/Tracking.js" name="Tracking">
+        <clobbers target="Tracking" />
+        <clobbers target="cordova.plugins.Tracking" />
+    </js-module>
+
+    <!-- android -->
+    <platform name="android">
+        <config-file parent="/*" target="res/xml/config.xml">
+            <feature name="TrackingIO">
+                <param name="android-package" value="com.luyi.trackingio.TrackingIOCordovaPlugin" />
+            </feature>
+            <preference name="TRACKINGIO_APPKEY" value="$TRACKINGIO_APPKEY" />
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.INTERNET"/>
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+            <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+            <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+        </config-file>
+
+        <source-file src="src/android/TrackingIOCordovaPlugin.java" target-dir="com/luyi/trackingio" />
+        <source-file src="src/android/lib/bcprov-jdk16-139.aar" target-dir="libs" />
+        <source-file src="src/android/lib/bcprov-jdk16-139.aar" target-dir="libs" />
+        <source-file src="src/android/lib/bcprov-jdk16-139.aar" target-dir="libs" />
+        <framework src="src/android/taomeesdk.gradle" custom="true" type="gradleReference" />
+    </platform>
+</plugin>
