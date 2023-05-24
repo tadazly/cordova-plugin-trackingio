@@ -14,10 +14,11 @@
   },
   "keywords": [
     "cordova",
-    "tpns",
+    "trackingio",
+    "reyun",
     "sdk",
     "ecosystem:cordova",
-    "cordova-ios"
+    "cordova-android"
   ],
   "author": "tadazly",
   "license": "Apache 2.0",

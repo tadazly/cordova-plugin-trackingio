@@ -17,8 +17,8 @@
     <!-- android -->
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
-            <feature name="TrackingIO">
-                <param name="android-package" value="com.luyi.trackingio.TrackingIOCordovaPlugin" />
+            <feature name="Tracking">
+                <param name="android-package" value="com.tadazly.trackingio.TrackingIOCordovaPlugin" />
             </feature>
             <preference name="TRACKINGIO_APPKEY" value="$TRACKINGIO_APPKEY" />
         </config-file>
@@ -30,10 +30,11 @@
             <uses-permission android:name="android.permission.READ_PHONE_STATE" />
         </config-file>
 
-        <source-file src="src/android/TrackingIOCordovaPlugin.java" target-dir="com/luyi/trackingio" />
-        <source-file src="src/android/lib/bcprov-jdk16-139.aar" target-dir="libs" />
-        <source-file src="src/android/lib/bcprov-jdk16-139.aar" target-dir="libs" />
-        <source-file src="src/android/lib/bcprov-jdk16-139.aar" target-dir="libs" />
-        <framework src="src/android/taomeesdk.gradle" custom="true" type="gradleReference" />
+        <source-file src="src/android/TrackingIOCordovaPlugin.java" target-dir="com/tadazly/trackingio" />
+        <source-file src="src/android/libs/tracking1.9.2.jar" target-dir="libs" />
+        <source-file src="src/android/libs/oaid_sdk_1.0.25.aar" target-dir="libs" />
+        <source-file src="src/android/libs/bcprov-jdk16-139.jar" target-dir="libs" />
+        <source-file src="src/android/assets/supplierconfig.json" target-dir="assets" />
+        <framework src="src/android/trackingio-build.gradle" custom="true" type="gradleReference" />
     </platform>
 </plugin>
