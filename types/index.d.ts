@@ -21,6 +21,12 @@ declare namespace Tracking {
      * @example const uuid = await Tracking.getDeviceId();
      */
     function getDeviceId(): Promise<string>;
+    
+    /**
+     * 获取 oaid
+     * @example const uuid = await Tracking.getOAID();
+     */
+    function getOAID(): Promise<string>;
 
     /**
      * 应用启动后，初始化热云 SDK，报送应用安装或启动事件

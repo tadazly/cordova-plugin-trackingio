@@ -23,14 +23,23 @@
             <preference name="TRACKINGIO_APPKEY" value="$TRACKINGIO_APPKEY" />
         </config-file>
 
+        <!-- oaid_sdk_1.0.25.aar minSdkVersion is 21, but my project is 19, so add this -->
+        <edit-config file="AndroidManifest.xml" target="/manifest" mode="merge">
+            <manifest xmlns:tools="http://schemas.android.com/tools" />
+        </edit-config>
+
         <config-file target="AndroidManifest.xml" parent="/*">
             <uses-permission android:name="android.permission.INTERNET"/>
             <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
             <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
             <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+            <!-- oaid_sdk_1.0.25.aar minSdkVersion is 21, but my project is 19, so add this -->
+            <uses-sdk tools:overrideLibrary="com.bun.miitmdid" />
         </config-file>
 
-        <source-file src="src/android/TrackingIOCordovaPlugin.java" target-dir="com/tadazly/trackingio" />
+
+        <source-file src="src/android/TrackingIOCordovaPlugin.java" target-dir="src/com/tadazly/trackingio" />
         <source-file src="src/android/libs/tracking1.9.2.jar" target-dir="libs" />
         <source-file src="src/android/libs/oaid_sdk_1.0.25.aar" target-dir="libs" />
         <source-file src="src/android/libs/bcprov-jdk16-139.jar" target-dir="libs" />

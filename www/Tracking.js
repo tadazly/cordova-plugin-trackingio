@@ -11,7 +11,17 @@ module.exports = {
                 resolve(res);
             }, function (err) {
                 reject(err);
-            }, 'Tracking', getDeviceId, []);
+            }, 'Tracking', 'getDeviceId', []);
+        });
+    },
+
+    getOAID() {
+        return new Promise(function (resolve, reject) {
+            exec(function (res) {
+                resolve(res);
+            }, function (err) {
+                reject(err);
+            }, 'Tracking', 'getOAID', []);
         });
     },
 
