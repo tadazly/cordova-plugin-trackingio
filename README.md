@@ -12,6 +12,7 @@
 - Android
     - [TrackingIO SDK v1.9.2](http://newdoc.trackingio.com/AndroidSDK.html)
     - OAID SDK v1.0.25 来源大佬：[多看书_ + Android OAID 获取 基于MSA oaid_sdk_1.0.25.zip](https://www.jianshu.com/p/748df2fddc9a)
+    - 相关权限请参考TrackingIO SDK，在调用前确保权限已经申请。
 - iOS 
     - 待定
 

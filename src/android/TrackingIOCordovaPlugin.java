@@ -1,11 +1,8 @@
 package com.tadazly.trackingio;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
-import android.content.pm.PackageManager;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 /** 热云sdk */
@@ -67,14 +64,6 @@ public class TrackingIOCordovaPlugin extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, CordovaArgs args, CallbackContext callbackContext) throws JSONException {
-        if (ContextCompat.checkSelfPermission(
-                cordova.getContext(), Manifest.permission.READ_PHONE_STATE) ==
-                PackageManager.PERMISSION_GRANTED) {
-            Log.d(LOG_TAG, "TrackingIO Permission yeah");
-        } else {
-            Log.e(LOG_TAG, "TrackingIO Permission noooooh");
-        }
-
         Log.d(LOG_TAG, "TrackingIO Action:" + action);
         if (action.equals("setDebugMode")) {
             return this.setDebugMode(args, callbackContext);
