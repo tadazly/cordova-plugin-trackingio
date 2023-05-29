@@ -116,8 +116,19 @@ Tracking.initWithKeyAndChannelId(
 ```
 
 ### 3.OAID获取不到的情况
-经不严谨测试，模拟器在调用oaid初始化( MdidSdkHelper.InitSdk )方法后，走不进回调函数 :(  
-这种情况下，默认返回 'unknown'，如果想抛出错误，请手动修改TrackingIOCordovaPlugin.java中的getOAID方法，已经帮你注释好了。
+- 返回 unknown
+
+    经不严谨测试，模拟器在调用oaid初始化( MdidSdkHelper.InitSdk )方法后，走不进回调函数 :(  
+这种情况下，默认返回 'unknown'，如果想抛出错误，请手动修改TrackingIOCordovaPlugin.java中的getOAID方法。
+
+- 返回 00000000000000000000000000000000
+    
+    部分手机会在初次调用sdk时提示个性化推荐服务权限，在没有获得权限前或者被拒绝后会返回。
+
+### 4.onDestroy没有调用情况
+- 本插件会在onDestroy时判断是否已经手动调用过统计时长和退出SDK的api，如果没有调用过，自动帮你调用。
+- 正常情况下，在app结束时，PluginManager会调用所有被使用过的Cordova插件的onDestroy方法。
+- 如果没有正常调用，检查是否有别的插件在onDestroy里做了杀进程的操作，比如某个插件在onDestroy里写了android.os.Process.killProcess(android.os.Process.myPid());
 
 ## 四、API使用说明
 
