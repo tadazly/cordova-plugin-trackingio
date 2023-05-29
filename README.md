@@ -1,4 +1,4 @@
-# 本项目尚未完成，敬请期待（Caution：Under Construction）
+# 本项目尚未完成测试，敬请期待（Caution：Under Construction）
 
 # cordova-plugin-trackingio
 
@@ -8,16 +8,28 @@
 
 热云是一款移动应用数据分析平台，通过集成热云 SDK，开发者可以统计应用的启动、注册、登录、充值、事件等关键数据，以便进行数据分析和业务优化。
 
-### TrackingIO SDK版本
-- [Android SDK      v1.9.2](http://newdoc.trackingio.com/AndroidSDK.html)
-- iOS SDK          待定
+### SDK版本
+- Android
+    - [TrackingIO SDK v1.9.2](http://newdoc.trackingio.com/AndroidSDK.html)
+    - OAID SDK v1.0.25 来源大佬：[多看书_ + Android OAID 获取 基于MSA oaid_sdk_1.0.25.zip](https://www.jianshu.com/p/748df2fddc9a)
+- iOS 
+    - 待定
 
 ## 二、接入流程
 ### 1.在项目中安装插件
 
+- android安装前必看 ！
+    - 项目中使用了oaid sdk 1.0.25，他的minSdkVersion是21
+    - 如果你的Cordova项目符合这个要求，以下几种方式都适合您，请放心安装～
+    - 如果你的Cordova项目正好和我的一样不符合这个要求，比如我的是19，那么请先将本项目clone下来，然后将plugin.xml中注释包围的几行取消注释，最后再使用第3种方式（通过本地路径安装），安装命令后面接上 --force
+
+    ``` shell
+    cordova plugin add /local/path/to/cordova-plugin-trackingio --variable TRACKINGIO_APPKEY=IX4BGYYG8L4L --force
+    ```
+
 - 安装时使用的 TRACKINGIO_APPKEY 需要在[热云产品中心创建](http://newdoc.trackingio.com/AndroidSDK.html#1%E7%94%B3%E8%AF%B7appkey)
 
-1. 通过npm安装
+1. 通过npm安装（还没有上传npm，装不了）
 ``` shell
 cordova plugin add cordova-plugin-trackingio --variable TRACKINGIO_APPKEY=IX4BGYYG8L4L
 ```
@@ -64,7 +76,8 @@ Tracking.setDebugMode(true);
 
     “全部产品按钮” - “待调试产品”–“调试”
 
-### 5.获取设备ID
+## 三、通用说明
+### 1.获取设备ID
 如果开发者没有自己的用户系统，希望使用用户设备ID作为accountId，直接调用Tracking.getDeviceId()方法获取设备ID即可。
 
 该方法一定要在调用初始化接口之后间隔5s以上再使用，否则会影响取值。
@@ -73,12 +86,46 @@ Tracking.setDebugMode(true);
 const uuid = await Tracking.getDeviceId();
 ```
 
+### 2.通过后台来统计
+如果你的项目后台很好说话，他愿意帮助你来接热云，那么谢谢他，我们只需要初始化sdk，然后在用户注册、登录的时候将设备id和oaid提供给后台就行，剩下的统计全部交给后台。
+``` typescript
+// onDeviceReady
+const initParams: initParameters = {
+    // 你的配置...
+}
+Tracking.initWithKeyAndChannelId(
+    initParams,
+    () => {
+        // onSuccess
+        console.log('TrackingIO 初始化成功');
+        // 据热云sdk描述，需要隔5s再取...
+        setTimeout(() => {
+            Tracking.getDeviceId().then(deviceId => {
+                console.log('TrackingIO deviceId: ' + deviceId);
+            });
+            Tracking.getOAID().then(oaid => {
+                console.log('TrackingIO oaid: ' + oaid);
+            });
+        }, 5000);
+    },
+    () => {
+        // onFailed
+        console.error('TrackingIO 初始化失败');
+    }
+);
+```
 
-## 三、API使用说明
+### 3.OAID获取不到的情况
+经不严谨测试，模拟器在调用oaid初始化( MdidSdkHelper.InitSdk )方法后，走不进回调函数 :(  
+这种情况下，默认返回 'unknown'，如果想抛出错误，请手动修改TrackingIOCordovaPlugin.java中的getOAID方法，已经帮你注释好了。
+
+## 四、API使用说明
 
 ### 1.[初始化热云SDK](http://newdoc.trackingio.com/AndroidSDK.html#2%E5%88%9D%E5%A7%8B%E5%8C%96%E7%83%AD%E4%BA%91sdk)
 
-初始化参数说明：appKey默认使用安装插件时的TRACKINGIO_APPKEY参数，插件使用1.0.25版本的oaid sdk，理论上不用传入任何与oaid相关的参数，待测试。
+初始化参数说明：
+- appKey默认使用安装插件时的TRACKINGIO_APPKEY参数，不推荐从js传入。
+- 插件提供1.0.25版本的oaid sdk，理论上不用传入任何与oaid相关的参数。
 ``` typescript
 type initParameters = {
     appKey?: string
@@ -91,9 +138,26 @@ type initParameters = {
 
 ``` typescript
 const initParams: initParameters = {
+    // 你的配置...
     channelId: 'test',
-}
-Tracking.initWithKeyAndChannelId(initParams);
+};
+Tracking.initWithKeyAndChannelId(
+    initParams,
+    () => {/** on Success **/},
+    (err) => {/** on Error **/}
+);
+```
+#### 1.1 获取设备ID
+该方法一定要在调用初始化接口之后间隔5s以上再使用，否则会影响取值。
+``` typescript
+const deviceId = await Tracking.getDeviceId();
+```
+#### 1.2 获取OAID
+- 如果初始化参数填入了oaid，直接返回提供的oaid。
+- 如果没有提供，会自动调用插件自带的oaid sdk去获取。
+    - 注意：模拟器和 androidTarget < 29 获取不到这该死的oaid，返回 'unknown'
+``` typescript
+const oaid = await Tracking.getOAID();
 ```
 
 ### 2.[统计用户注册数据](http://newdoc.trackingio.com/AndroidSDK.html#3%E7%BB%9F%E8%AE%A1%E7%94%A8%E6%88%B7%E6%B3%A8%E5%86%8C%E6%95%B0%E6%8D%AE)
@@ -139,6 +203,7 @@ Tracking.setAdClick('csj', 'adid123456');
 ```
 
 ### 9.[统计app使用时长事件](http://newdoc.trackingio.com/AndroidSDK.html#10%E7%BB%9F%E8%AE%A1app%E4%BD%BF%E7%94%A8%E6%97%B6%E9%95%BF%E4%BA%8B%E4%BB%B6)
+如果没有调用，那么在app关闭时会自动调用。
 
 ``` typescript
 Tracking.setAppDuration(3);
@@ -151,6 +216,7 @@ Tracking.setPageDuration('module.HappyNewYearActivity', 3);
 ```
 
 ### 11.[退出sdk](http://newdoc.trackingio.com/AndroidSDK.html#12%E9%80%80%E5%87%BAsdk)
+如果没有调用，那么在app关闭时会自动调用。
 
 ``` typescript
 Tracking.exitSdk();

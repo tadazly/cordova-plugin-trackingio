@@ -23,19 +23,20 @@
             <preference name="TRACKINGIO_APPKEY" value="$TRACKINGIO_APPKEY" />
         </config-file>
 
-        <!-- oaid_sdk_1.0.25.aar minSdkVersion is 21, but my project is 19, so add this -->
-        <edit-config file="AndroidManifest.xml" target="/manifest" mode="merge">
+        <!-- oaid_sdk_1.0.25.aar minSdkVersion is 21, but my project is 19, so add this : start -->
+        <!-- <edit-config file="AndroidManifest.xml" target="/manifest" mode="merge">
             <manifest xmlns:tools="http://schemas.android.com/tools" />
         </edit-config>
+        <edit-config file="AndroidManifest.xml" target="/manifest/uses-sdk" mode="merge">
+            <uses-sdk tools:overrideLibrary="com.bun.miitmdid" />
+        </edit-config> -->
+        <!-- oaid_sdk_1.0.25.aar minSdkVersion is 21, but my project is 19, so add this : end -->
 
         <config-file target="AndroidManifest.xml" parent="/*">
             <uses-permission android:name="android.permission.INTERNET"/>
             <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
             <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
             <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
-            <!-- oaid_sdk_1.0.25.aar minSdkVersion is 21, but my project is 19, so add this -->
-            <uses-sdk tools:overrideLibrary="com.bun.miitmdid" />
         </config-file>
 
 

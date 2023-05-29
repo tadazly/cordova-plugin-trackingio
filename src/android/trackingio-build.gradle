@@ -13,5 +13,6 @@ android {
 }
 
 dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation files('libs/oaid_sdk_1.0.25.aar')
 }

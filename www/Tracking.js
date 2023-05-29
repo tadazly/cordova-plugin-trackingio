@@ -26,6 +26,9 @@ module.exports = {
     },
 
     initWithKeyAndChannelId(params, onSuccess, onError) {
+        if (!params) {
+            params = {};
+        }
         exec(onSuccess, onError, 'Tracking', 'initWithKeyAndChannelId', [params]);
     },
 

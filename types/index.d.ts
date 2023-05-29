@@ -33,7 +33,7 @@ declare namespace Tracking {
      * @param params 
      * @example Tracking.initWithKeyAndChannelId({channelId: '_default_'});
      */
-    function initWithKeyAndChannelId(params: initParameters): void;
+    function initWithKeyAndChannelId(params: initParameters, onSuccess?: ()=> void, onError?: (err: string) => void): void;
 
     /**
      * 在用户注册完成时调用Tracking.setRegisterWithAccountID方法。

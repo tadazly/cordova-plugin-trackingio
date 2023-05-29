@@ -2,6 +2,7 @@ package com.tadazly.trackingio;
 
 import android.app.Activity;
 import android.app.Application;
+import android.os.Handler;
 import android.util.Log;
 
 /** 热云sdk */
@@ -18,7 +19,6 @@ import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,15 +27,14 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class TrackingIOCordovaPlugin extends CordovaPlugin {
-    private final static String LOG_TAG = "plugin.TrackingIO";
+    public final static String LOG_TAG = "plugin.TrackingIO";
     private static String APP_KEY;
     private static String OAID;
-    private static Activity yourApp;
+    private Activity yourApp;
     private long appStartTime;
 
-    // 缓存context，用于oaid sdk回调
-    private static CallbackContext initContext;
-    private static InitParameters initParameters;
+    // oaid sdk 回调函数超时定时器
+    private Handler oaidTimeoutHandler;
     // 用于标记是否初始化过Sdk
     private static boolean hasInitSdk = false;
     // 用于标记退出时调用的两个api，防止重复调用
@@ -129,7 +128,7 @@ public class TrackingIOCordovaPlugin extends CordovaPlugin {
             callbackContext.success(deviceId);
         } else {
             callbackContext.success("unknown");
-            callbackContext.error("Cannot get DeviceId");
+//            callbackContext.error("Cannot get DeviceId");
         }
         return true;
     }
@@ -139,7 +138,7 @@ public class TrackingIOCordovaPlugin extends CordovaPlugin {
             callbackContext.success(OAID);
         } else {
             callbackContext.success("unknown");
-            callbackContext.error("Cannot get OAID");
+//            callbackContext.error("Cannot get OAID");
         }
         return true;
     }
@@ -184,36 +183,57 @@ public class TrackingIOCordovaPlugin extends CordovaPlugin {
             hasInitSdk = true;
             Log.d(LOG_TAG, "TrackingIO init success !");
             callbackContext.success();
-        } else {
-            Log.d(LOG_TAG, "OAID start init");
-            int errorCode = MdidSdkHelper.InitSdk(app.getApplicationContext(), true, new IIdentifierListener() {
+        } else if (oaidTimeoutHandler == null) {
+            int OAID_TIMEOUT_MILLIS = 5000;
+            oaidTimeoutHandler = new Handler();
+            oaidTimeoutHandler.postDelayed(new Runnable() {
                 @Override
-                public void OnSupport(boolean b, IdSupplier idSupplier) {
-                    Log.d(LOG_TAG, "OAID callback");
-                    if(idSupplier != null && idSupplier.isSupported()) {
-                        OAID = idSupplier.getOAID();
-                        Log.d(LOG_TAG, "OAID generated: " + OAID);
-                    }
-                    if (parameters != null && callbackContext != null) {
-                        Tracking.initWithKeyAndChannelId(app, parameters);
-                        hasInitSdk = true;
-                        Log.d(LOG_TAG, "TrackingIO init success !");
-                        callbackContext.success(); // Thread-safe.
+                public void run() {
+                    Log.e(LOG_TAG, "OAID callback Timeout !!!");
+                    Tracking.initWithKeyAndChannelId(app, parameters);
+                    hasInitSdk = true;
+                    Log.d(LOG_TAG, "TrackingIO init success !");
+                    callbackContext.success(); // Thread-safe.
+                }
+            }, OAID_TIMEOUT_MILLIS);
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    Log.d(LOG_TAG, "OAID start init");
+                    int errorCode = MdidSdkHelper.InitSdk(yourApp.getApplicationContext(), true, new IIdentifierListener() {
+                        @Override
+                        public void OnSupport(boolean support, IdSupplier idSupplier) {
+                            if (oaidTimeoutHandler != null) {
+                                oaidTimeoutHandler.removeCallbacksAndMessages(null);
+                                oaidTimeoutHandler = null;
+                            }
+                            Log.d(LOG_TAG, "OAID callback");
+                            if(idSupplier != null && idSupplier.isSupported()) {
+                                OAID = idSupplier.getOAID();
+                                parameters.oaid = OAID;
+                                Log.d(LOG_TAG, "OAID generated: " + OAID);
+                            } else {
+                                Log.e(LOG_TAG, "OAID Not Supported !!!");
+                            }
+                            Tracking.initWithKeyAndChannelId(app, parameters);
+                            hasInitSdk = true;
+                            Log.d(LOG_TAG, "TrackingIO init success !");
+                            callbackContext.success(); // Thread-safe.
+                        }
+                    });
+                    Log.d(LOG_TAG, "OAID init result: " + errorCode);
+                    if (errorCode  == ErrorCode.INIT_ERROR_DEVICE_NOSUPPORT) {
+                        Log.e(LOG_TAG,"不支持的设备");
+                    } else if (errorCode == ErrorCode.INIT_ERROR_LOAD_CONFIGFILE) {
+                        Log.e(LOG_TAG,"加载配置文件出错");
+                    } else if (errorCode == ErrorCode.INIT_ERROR_MANUFACTURER_NOSUPPORT) {
+                        Log.e(LOG_TAG,"不支持的设备厂商");
+                    } else if (errorCode == ErrorCode.INIT_ERROR_RESULT_DELAY) {
+                        Log.d(LOG_TAG,"获取接口是异步的，结果会在回调中返回，回调执行的回调可能在工作线程");
+                    } else if (errorCode == ErrorCode.INIT_HELPER_CALL_ERROR) {
+                        Log.e(LOG_TAG,"反射调用出错");
                     }
                 }
             });
-            Log.d(LOG_TAG, "OAID init result: " + errorCode);
-            if (errorCode  == ErrorCode.INIT_ERROR_DEVICE_NOSUPPORT) {
-                Log.e(LOG_TAG,"不支持的设备");
-            } else if (errorCode == ErrorCode.INIT_ERROR_LOAD_CONFIGFILE) {
-                Log.e(LOG_TAG,"加载配置文件出错");
-            } else if (errorCode == ErrorCode.INIT_ERROR_MANUFACTURER_NOSUPPORT) {
-                Log.e(LOG_TAG,"不支持的设备厂商");
-            } else if (errorCode == ErrorCode.INIT_ERROR_RESULT_DELAY) {
-                Log.e(LOG_TAG,"获取接口是异步的，结果会在回调中返回，回调执行的回调可能在工作线程");
-            } else if (errorCode == ErrorCode.INIT_HELPER_CALL_ERROR) {
-                Log.e(LOG_TAG,"反射调用出错");
-            }
         }
         return true;
     }
@@ -233,6 +253,7 @@ public class TrackingIOCordovaPlugin extends CordovaPlugin {
         String accountId = args.getString(0);
         if (accountId != null && accountId.length() > 0) {
             Tracking.setLoginSuccessBusiness(accountId);
+            callbackContext.success();
         } else {
             callbackContext.error("Please give accountId");
         }
@@ -270,11 +291,10 @@ public class TrackingIOCordovaPlugin extends CordovaPlugin {
         if (paymentType != null && currencyType != null && currencyAmount != null) {
             Tracking.setOrder(paymentType, currencyType, currencyAmount);
             callbackContext.success();
-            return true;
         } else {
             callbackContext.error("Wrong Parameters!");
-            return true;
         }
+        return true;
     }
 
     private boolean setEvent(CordovaArgs args, CallbackContext callbackContext) throws JSONException {
@@ -285,11 +305,10 @@ public class TrackingIOCordovaPlugin extends CordovaPlugin {
         if (eventName != null && extra != null && map != null) {
             Tracking.setEvent(eventName, map);
             callbackContext.success();
-            return true;
         } else {
             callbackContext.error("Wrong Parameters!");
-            return true;
         }
+        return true;
     }
 
     private boolean setAdShow(CordovaArgs args, CallbackContext callbackContext) throws JSONException {
@@ -300,11 +319,10 @@ public class TrackingIOCordovaPlugin extends CordovaPlugin {
         if (adPlatform != null && adId != null && fill != null) {
             Tracking.setAdShow(adPlatform, adId, fill);
             callbackContext.success();
-            return true;
         } else {
             callbackContext.error("Wrong Parameters!");
-            return true;
         }
+        return true;
     }
 
     private boolean setAdClick(CordovaArgs args, CallbackContext callbackContext) throws JSONException {
@@ -314,11 +332,10 @@ public class TrackingIOCordovaPlugin extends CordovaPlugin {
         if (adPlatform != null && adId != null) {
             Tracking.setAdClick(adPlatform, adId);
             callbackContext.success();
-            return true;
         } else {
             callbackContext.error("Wrong Parameters!");
-            return true;
         }
+        return true;
     }
 
     private boolean setAppDuration(CordovaArgs args, CallbackContext callbackContext) throws JSONException {
@@ -329,11 +346,10 @@ public class TrackingIOCordovaPlugin extends CordovaPlugin {
             Tracking.setAppDuration(duration);
             Log.d(LOG_TAG, "TrackingIO AppDuration: " + duration);
             callbackContext.success();
-            return true;
         } else {
             callbackContext.error("Wrong Parameters!");
-            return true;
         }
+        return true;
     }
 
     private boolean setPageDuration(CordovaArgs args, CallbackContext callbackContext) throws JSONException {
@@ -343,14 +359,13 @@ public class TrackingIOCordovaPlugin extends CordovaPlugin {
         if (activityName != null && duration != null) {
             Tracking.setPageDuration(activityName, duration);
             callbackContext.success();
-            return true;
         } else {
             callbackContext.error("Wrong Parameters!");
-            return true;
         }
+        return true;
     }
 
-    private boolean exitSdk(CordovaArgs args, CallbackContext callbackContext) throws JSONException {
+    private boolean exitSdk(CordovaArgs args, CallbackContext callbackContext) {
         this.hasCallExitSdk = true;
         Tracking.exitSdk();
         Log.d(LOG_TAG, "TrackingIO Cordova Plugin Exited");
@@ -361,6 +376,10 @@ public class TrackingIOCordovaPlugin extends CordovaPlugin {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (this.oaidTimeoutHandler != null) {
+            this.oaidTimeoutHandler.removeCallbacksAndMessages(null);
+            this.oaidTimeoutHandler = null;
+        }
         if (hasInitSdk) {
             // 如果没有手动调用退出的api，则在销毁插件时自动调用
             if (!this.hasCallSetAppDuration) {
