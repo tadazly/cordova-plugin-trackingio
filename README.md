@@ -54,10 +54,7 @@ cordova plugin add /local/path/to/cordova-plugin-trackingio --variable TRACKINGI
 
 ### 2.项目配置
 - Android
-    - 参照[SDK文档添加配置](http://newdoc.trackingio.com/AndroidSDK.html#12%E5%9C%A8%E5%BA%94%E7%94%A8%E7%9A%84buildgradle%E4%B8%8B%E5%A2%9E%E5%8A%A0%E5%A6%82%E4%B8%8B%E9%85%8D%E7%BD%AE)
-    
-        1. 待定
-        2. 待定
+    - 无需额外配置
 
 ### 3.使用方式
 
@@ -120,11 +117,15 @@ Tracking.initWithKeyAndChannelId(
 - 返回 unknown
 
     经不严谨测试，模拟器在调用oaid初始化( MdidSdkHelper.InitSdk )方法后，走不进回调函数 :(  
-这种情况下，默认返回 'unknown'，如果想抛出错误，请手动修改TrackingIOCordovaPlugin.java中的getOAID方法。
+    
+    这种情况下，默认返回 'unknown'，如果想抛出错误，请手动修改TrackingIOCordovaPlugin.java中的getOAID方法。
 
 - 返回 00000000000000000000000000000000
     
     部分手机会在初次调用sdk时提示个性化推荐服务权限，在没有获得权限前或者被拒绝后会返回。
+    
+    解决办法参考 [EXTRA] 部分，首先在app获取权限后先调用Tracking.initOaidSdk()，然后再在登陆你的用户系统前调用Tracking.initWithKeyAndChannelId(...)确保热云sdk在初始化的时候能够正确拿到oaid。
+
 
 ### 4.onDestroy没有调用情况
 - 本插件会在onDestroy时判断是否已经手动调用过统计时长和退出SDK的api，如果没有调用过，自动帮你调用。
@@ -235,13 +236,25 @@ Tracking.exitSdk();
 ```
 
 ## Extra: 先初始化oaid sdk，延后初始化热云sdk
+#### 以下内容是基于你使用本插件自带的oaid sdk来获取oaid的情况来说明。如果你自己可以获得oaid，那么请直接在initWithKeyAndChannelId的初始化参数中设置吧，后面和你没关系。
 部分手机可能存在调用oaid sdk时会弹出一个让用户选择是否同意个性化推荐服务的弹窗，此时用户没有操作也会立即走入oaid sdk初始化完成的回调函数，并返回support=true和oaid=000000000000000，建议第一次打开app时先调用这个接口让用户做选择，延后调用热云sdk的初始化。
 ``` typescript
 Tracking.initOaidSdk(oaid=>{
     console.log(oaid);
 });
 ```
-
+举个例子：
+#### 初次启动app流程
+1. 弹出你的请求权限弹窗（给我XXX权限，blabla...）[拒绝][同意]
+2. 用户点击[同意]，此时我们调用 Tracking.initOaidSdk，并再弹出一个需要用户交互的弹窗（Hello，blabla...）[确认]
+    - 此时如果系统弹窗了，那么用户肯定会先点击系统的弹窗。
+    - 没弹窗是最好的了。
+    - 此时无论与否，用户已经对是否开启个性化推荐功能完成了选择。
+3. 接下来用户只有一个选择，点击你的[确认]按钮，接下来就可以进入你的正常app流程了。
+#### 正常启动app流程
+1. 判断是否获得权限。
+2. 如果有READ_PHONE_STATE权限，则正式调用 Tracking.initWithKeyAndChannelId(...) 初始化热云。
+3. 接下来做你爱做的事吧。
 
 ## 技术支持
 如有任何问题，请及时联系[热云的技术支持工程师](http://newdoc.trackingio.com/AndroidSDK.html#%E6%8A%80%E6%9C%AF%E6%94%AF%E6%8C%81) ：）
