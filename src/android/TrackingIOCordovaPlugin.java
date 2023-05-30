@@ -65,7 +65,10 @@ public class TrackingIOCordovaPlugin extends CordovaPlugin {
     @Override
     public boolean execute(String action, CordovaArgs args, CallbackContext callbackContext) throws JSONException {
         Log.d(LOG_TAG, "TrackingIO Action:" + action);
-        if (action.equals("setDebugMode")) {
+        if (action.equals("initOaidSdk")) {
+            return this.initOaidSdk(args, callbackContext);
+        }
+        else if (action.equals("setDebugMode")) {
             return this.setDebugMode(args, callbackContext);
         }
         else if (action.equals("initWithKeyAndChannelId")) {
@@ -140,6 +143,54 @@ public class TrackingIOCordovaPlugin extends CordovaPlugin {
             callbackContext.success("unknown");
 //            callbackContext.error("Cannot get OAID");
         }
+        return true;
+    }
+
+    // 注意这个初始化的时oaid sdk，并不是TrackingIO sdk
+    // 提前调用oaid sdk初始化，来应对个性化推荐服务弹窗
+    private boolean initOaidSdk(CordovaArgs args, CallbackContext callbackContext) throws JSONException {
+        if (hasInitSdk) {
+            callbackContext.success(OAID);
+            return true;
+        }
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                Log.d(LOG_TAG, "OAID start init");
+                int errorCode = MdidSdkHelper.InitSdk(yourApp.getApplicationContext(), true, new IIdentifierListener() {
+                    @Override
+                    public void OnSupport(boolean support, IdSupplier idSupplier) {
+                        Log.d(LOG_TAG, "OAID callback");
+                        if(idSupplier != null && idSupplier.isSupported()) {
+                            String oaid = idSupplier.getOAID();
+                            if (oaid.equals("00000000000000000000000000000000")) {
+                                Log.w(LOG_TAG, "OAID Not Got permission !!!");
+                                callbackContext.success("unknown");
+//                                callbackContext.error("OAID Not Supported !!!");
+                            } else {
+                                OAID = oaid;
+                                Log.d(LOG_TAG, "OAID generated: " + OAID);
+                                callbackContext.success(oaid); // Thread-safe.
+                            }
+                        } else {
+                            Log.e(LOG_TAG, "OAID Not Supported !!!");
+                            callbackContext.error("OAID Not Supported !!!");
+                        }
+                    }
+                });
+                Log.d(LOG_TAG, "OAID init result: " + errorCode);
+                if (errorCode  == ErrorCode.INIT_ERROR_DEVICE_NOSUPPORT) {
+                    Log.e(LOG_TAG,"不支持的设备");
+                } else if (errorCode == ErrorCode.INIT_ERROR_LOAD_CONFIGFILE) {
+                    Log.e(LOG_TAG,"加载配置文件出错");
+                } else if (errorCode == ErrorCode.INIT_ERROR_MANUFACTURER_NOSUPPORT) {
+                    Log.e(LOG_TAG,"不支持的设备厂商");
+                } else if (errorCode == ErrorCode.INIT_ERROR_RESULT_DELAY) {
+                    Log.d(LOG_TAG,"获取接口是异步的，结果会在回调中返回，回调执行的回调可能在工作线程");
+                } else if (errorCode == ErrorCode.INIT_HELPER_CALL_ERROR) {
+                    Log.e(LOG_TAG,"反射调用出错");
+                }
+            }
+        });
         return true;
     }
 

@@ -234,5 +234,14 @@ Tracking.setPageDuration('module.HappyNewYearActivity', 3);
 Tracking.exitSdk();
 ```
 
+## Extra: 先初始化oaid sdk，延后初始化热云sdk
+部分手机可能存在调用oaid sdk时会弹出一个让用户选择是否同意个性化推荐服务的弹窗，此时用户没有操作也会立即走入oaid sdk初始化完成的回调函数，并返回support=true和oaid=000000000000000，建议第一次打开app时先调用这个接口让用户做选择，延后调用热云sdk的初始化。
+``` typescript
+Tracking.initOaidSdk(oaid=>{
+    console.log(oaid);
+});
+```
+
+
 ## 技术支持
 如有任何问题，请及时联系[热云的技术支持工程师](http://newdoc.trackingio.com/AndroidSDK.html#%E6%8A%80%E6%9C%AF%E6%94%AF%E6%8C%81) ：）

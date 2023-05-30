@@ -29,6 +29,13 @@ declare namespace Tracking {
     function getOAID(): Promise<string>;
 
     /**
+     * 初始化内置Oaid sdk，为了应对有个性化推荐弹窗的手机，提前先调用一遍oaid sdk，延后调用热云sdk的初始化。
+     * @param params 
+     * @example Tracking.initWithKeyAndChannelId({channelId: '_default_'});
+     */
+    function initOaidSdk(onSuccess?: (oaid: string)=> void, onError?: (err: string) => void): void;
+
+    /**
      * 应用启动后，初始化热云 SDK，报送应用安装或启动事件
      * @param params 
      * @example Tracking.initWithKeyAndChannelId({channelId: '_default_'});

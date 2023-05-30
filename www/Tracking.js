@@ -25,6 +25,10 @@ module.exports = {
         });
     },
 
+    initOaidSdk(onSuccess, onError) {
+        exec(onSuccess, onError, 'Tracking', 'initOaidSdk', []);
+    },
+
     initWithKeyAndChannelId(params, onSuccess, onError) {
         if (!params) {
             params = {};
