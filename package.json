@@ -16,6 +16,7 @@
     "cordova",
     "trackingio",
     "reyun",
+    "oaid",
     "sdk",
     "ecosystem:cordova",
     "cordova-android"
