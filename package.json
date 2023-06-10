@@ -1,7 +1,7 @@
 {
   "name": "cordova-plugin-trackingio",
   "version": "1.0.0",
-  "description": "热云SDK (A cordova plugin for trackingIO2.0 SDK)",
+  "description": "Cordova热云SDK插件 (A cordova plugin for trackingIO2.0 SDK)",
   "cordova": {
     "id": "cordova-plugin-trackingio",
     "platforms": [

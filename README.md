@@ -1,4 +1,4 @@
-# 本项目尚未完成测试，敬请期待（Caution：Under Construction）
+# Cordova热云SDK插件
 
 # cordova-plugin-trackingio
 
@@ -30,7 +30,7 @@
 
 - 安装时使用的 TRACKINGIO_APPKEY 需要在[热云产品中心创建](http://newdoc.trackingio.com/AndroidSDK.html#1%E7%94%B3%E8%AF%B7appkey)
 
-1. 通过npm安装（还没有上传npm，装不了）
+1. 通过npm安装
 ``` shell
 cordova plugin add cordova-plugin-trackingio --variable TRACKINGIO_APPKEY=IX4BGYYG8L4L
 ```
