@@ -6,6 +6,8 @@ declare namespace Tracking {
         oaid?: string
         assetFileName?: string
         oaidLibraryString?: string
+        caid?: string
+        caid2?: string
     }
 
     /**

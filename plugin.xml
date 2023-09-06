@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="cordova-plugin-trackingio" version="1.0.1">
+        id="cordova-plugin-trackingio" version="1.1.0">
     <name>TrackingIOCordovaPlugin</name>
     <description>TrackingIO2.0 Cordova Plugin</description>
     <license>Apache 2.0</license>
@@ -46,5 +46,43 @@
         <source-file src="src/android/libs/bcprov-jdk16-139.jar" target-dir="libs" />
         <source-file src="src/android/assets/supplierconfig.json" target-dir="assets" />
         <framework src="src/android/trackingio-build.gradle" custom="true" type="gradleReference" />
+    </platform>
+
+    <!-- ios -->
+    <platform name="ios">
+        <config-file target="*-Info.plist" parent="NSUserTrackingUsageDescription">
+          <string>请放心，开启权限不会获取你在其他站点的信息，该权限仅用于标识设备并保障游戏服务安全</string>
+        </config-file>
+        <config-file target="config.xml" parent="/*">
+            <feature name="Tracking">
+                <param name="ios-package" value="TrackingIOCordovaPlugin"/>
+            </feature>
+            <preference name="TRACKINGIO_APPKEY" value="$TRACKINGIO_APPKEY" />
+        </config-file>
+
+        <!-- Plugin source code -->
+        <header-file src="src/ios/TrackingIOCordovaPlugin.h" />
+        <source-file src="src/ios/TrackingIOCordovaPlugin.m" />
+
+        <!-- TrackingIO SDK Official -->
+        <header-file src="src/ios/libs/Tracking.h" />
+        <source-file src="src/ios/libs/libReYunTracking.a" framework="true" />
+
+        <!-- Other required frameworks -->
+        <framework src="Security.framework" />
+        <framework src="CoreTelephony.framework" />
+        <framework src="AdSupport.framework" />
+        <framework src="SystemConfiguration.framework" />
+        <framework src="CoreMotion.framework" />
+        <framework src="libsqlite3.dylib" />
+        <framework src="iAd.framework" />
+        <framework src="AdServices.framework" />
+        <framework src="AVFoundation.framework" />
+        <framework src="libz.tbd" />
+        <framework src="libresolv.9.tbd" />
+        <framework src="libresolv.tbd" />
+        <framework src="libc++.tbd" />
+        <framework src="CFNetwork.framework" />
+        <framework src="WebKit.framework" />
     </platform>
 </plugin>

@@ -10,11 +10,11 @@
 
 ### SDK版本
 - Android
-    - [TrackingIO SDK v1.9.2](http://newdoc.trackingio.com/AndroidSDK.html)
+    - [Android_SDK v1.9.2](http://newdoc.trackingio.com/AndroidSDK.html)
     - OAID SDK v1.0.25 来源大佬：[多看书_ + Android OAID 获取 基于MSA oaid_sdk_1.0.25.zip](https://www.jianshu.com/p/748df2fddc9a)
     - 相关权限请参考TrackingIO SDK，在调用前确保权限已经申请。
 - iOS 
-    - 待定
+    - [iOS_SDK v1.9.14](http://newdoc.trackingio.com/iOSSDK.html)
 
 ## 二、接入流程
 ### 1.在项目中安装插件
@@ -55,6 +55,8 @@ cordova plugin add /local/path/to/cordova-plugin-trackingio --variable TRACKINGI
 ### 2.项目配置
 - Android
     - 无需额外配置
+- iOS
+    - 关闭bitcode: 选择⼯程-> Build Settings -> 搜索bitcode ->设置为NO
 
 ### 3.使用方式
 
@@ -165,8 +167,9 @@ Tracking.initWithKeyAndChannelId(
 ``` typescript
 const deviceId = await Tracking.getDeviceId();
 ```
-#### 1.2 获取OAID
-- 如果初始化参数填入了oaid，直接返回提供的oaid。
+#### 1.2 获取OAID/IDFA
+- iOS通过该接口获取idfa，需要先调用initWithKeyAndChannelId或者initOaidSdk再调用getOAID。
+- Android如果初始化参数填入了oaid，直接返回提供的oaid。
 - 如果没有提供，会自动调用插件自带的oaid sdk去获取。
     - 注意：模拟器和 androidTarget < 29 获取不到这该死的oaid，返回 'unknown'
 ``` typescript
@@ -229,7 +232,7 @@ Tracking.setPageDuration('module.HappyNewYearActivity', 3);
 ```
 
 ### 11.[退出sdk](http://newdoc.trackingio.com/AndroidSDK.html#12%E9%80%80%E5%87%BAsdk)
-如果没有调用，那么在app关闭时会自动调用。
+如果没有调用，那么在app关闭时会自动调用。(ios不需要调用)
 
 ``` typescript
 Tracking.exitSdk();
@@ -255,6 +258,26 @@ Tracking.initOaidSdk(oaid=>{
 1. 判断是否获得权限。
 2. 如果有READ_PHONE_STATE权限，则正式调用 Tracking.initWithKeyAndChannelId(...) 初始化热云。
 3. 接下来做你爱做的事吧。
+
+## 五、iOS使用说明
+iOS的所有接口都与Android保持一致，initParameters可选appKey、channelId、caid、caid2。
+
+idfa可以通过getOAID获得，例：
+``` typescript
+Tracking.initWithKeyAndChannelId(
+    {},
+    () => {
+        /** on Success **/
+        setTimeout(async () => {
+            const deviceId = await Tracking.getDeviceId();
+            const idfa = await Tracking.getOAID();
+            console.log(`deviceId: ${deviceId}, idfa: ${idfa}`);
+            /** 接下来可以把deviceId与idfa传给后端开发，让后端开发来调用其余api，比如登录、支付等 **/
+        }, 5000);
+    },
+    (err) => {/** on Error **/}
+);
+```
 
 ## 技术支持
 如有任何问题，请及时联系[热云的技术支持工程师](http://newdoc.trackingio.com/AndroidSDK.html#%E6%8A%80%E6%9C%AF%E6%94%AF%E6%8C%81) ：）

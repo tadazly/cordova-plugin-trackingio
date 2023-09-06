@@ -1,11 +1,12 @@
 {
   "name": "cordova-plugin-trackingio",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Cordova热云SDK插件 (A cordova plugin for trackingIO2.0 SDK)",
   "cordova": {
     "id": "cordova-plugin-trackingio",
     "platforms": [
-      "android"
+      "android",
+      "ios"
     ]
   },
   "repository": {
@@ -19,7 +20,8 @@
     "oaid",
     "sdk",
     "ecosystem:cordova",
-    "cordova-android"
+    "cordova-android",
+    "cordova-ios"
   ],
   "author": "tadazly",
   "license": "Apache 2.0",
