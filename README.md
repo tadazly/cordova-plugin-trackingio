@@ -57,6 +57,9 @@ cordova plugin add /local/path/to/cordova-plugin-trackingio --variable TRACKINGI
     - 无需额外配置
 - iOS
     - 关闭bitcode: 选择⼯程-> Build Settings -> 搜索bitcode ->设置为NO
+    - （重要）AdServices.framework 以Optional形式引入
+        
+        Build Phases -> AdServices.framework Status: Optional
 
 ### 3.使用方式
 
