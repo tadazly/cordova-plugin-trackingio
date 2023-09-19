@@ -70,12 +70,14 @@
     NSString *channelId = [obj valueForKey:@"channelId"];
     NSString *caid = [obj valueForKey:@"caid"];
     NSString *caid2 = [obj valueForKey:@"caid2"];
+    BOOL ASAEnabled = [[obj valueForKey:@"ASAEnabled"] boolValue];
     if (!appKey) appKey = [[self.commandDelegate settings] objectForKey:@"trackingio_appkey"];
     if (!channelId) channelId = @"_default_";
-    NSLog(@"appKey%@",appKey);
-    NSLog(@"channelId%@",channelId);
-    NSLog(@"caid%@",caid);
-    NSLog(@"caid2%@",caid2);
+    NSLog(@"appKey %@",appKey);
+    NSLog(@"channelId %@",channelId);
+    NSLog(@"caid %@",caid);
+    NSLog(@"caid2 %@",caid2);
+    NSLog(@"ASAEnabled %@", [obj valueForKey:@"ASAEnabled"]);
     if (@available(iOS 14, *)) {
         // iOS14及以上版本需要先请求权限
         [ATTrackingManager requestTrackingAuthorizationWithCompletionHandler:^(ATTrackingManagerAuthorizationStatus status) {
@@ -87,6 +89,10 @@
             } else {
                 NSLog(@"请在设置-隐私-跟踪中允许App请求跟踪");
                 self.IDFA = @"unknown";
+            }
+            //如需投放ASA，请在初始化接口之前调用：
+            if (ASAEnabled) {
+                [Tracking setASAEnable:ASAEnabled];
             }
             //无论是否获取到idfa 在收到系统回调函数后调用热云SDK init函数
             [Tracking initWithAppKey:appKey withChannelId:channelId withCAID:caid withCAID2:caid2 withMobDNAOid:nil withParams:nil withStartupParams:nil];
@@ -103,6 +109,10 @@
         } else {
             NSLog(@"请在设置-隐私-广告中打开广告跟踪功能");
             self.IDFA = @"unknown";
+        }
+        //如需投放ASA，请在初始化接口之前调用：
+        if (ASAEnabled) {
+            [Tracking setASAEnable:ASAEnabled];
         }
         //无论是否获取到idfa 直接调用热云SDK init函数
         [Tracking initWithAppKey:appKey withChannelId:channelId withCAID:caid withCAID2:caid2 withMobDNAOid:nil withParams:nil withStartupParams:nil];

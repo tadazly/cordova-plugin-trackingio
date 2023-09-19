@@ -263,7 +263,7 @@ Tracking.initOaidSdk(oaid=>{
 3. 接下来做你爱做的事吧。
 
 ## 五、iOS使用说明
-iOS的所有接口都与Android保持一致，initParameters可选appKey、channelId、caid、caid2。
+iOS的所有接口都与Android保持一致，initParameters可选appKey、channelId、caid、caid2、ASAEnabled。
 
 idfa可以通过getOAID获得，例：
 ``` typescript

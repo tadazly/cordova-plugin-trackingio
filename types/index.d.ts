@@ -8,6 +8,7 @@ declare namespace Tracking {
         oaidLibraryString?: string
         caid?: string
         caid2?: string
+        ASAEnabled?: boolean
     }
 
     /**
