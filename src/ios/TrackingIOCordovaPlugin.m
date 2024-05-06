@@ -1,9 +1,40 @@
 #import "TrackingIOCordovaPlugin.h"
 #import <AppTrackingTransparency/AppTrackingTransparency.h>
 #import <AdSupport/ASIdentifierManager.h>
+#import <AdServices/AAAttribution.h>
 #import "Tracking.h"
 
 @implementation TrackingIOCordovaPlugin
+
+- (void)getIDFV:(CDVInvokedUrlCommand *_Nonnull)command
+{
+    NSString *idfv = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:idfv];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void)getASAToken:(CDVInvokedUrlCommand *_Nonnull)command
+{
+    if (@available(iOS 14.3, *)) {
+        NSError *error = nil;
+        NSString *attributionToken = [AAAttribution attributionTokenWithError:&error];
+        
+        if (attributionToken) {
+            // 成功获取到归因信息
+            NSLog(@"Attribution Token: %@", attributionToken);
+            CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:attributionToken];
+            [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        } else {
+            // 获取归因信息失败，可以查看错误信息
+            NSLog(@"Failed to get attribution token. Error: %@", error);
+            CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"unknown"];
+            [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        }
+    } else {
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"unknown"];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }
+}
 
 - (void)setDebugMode:(CDVInvokedUrlCommand *_Nonnull)command
 {

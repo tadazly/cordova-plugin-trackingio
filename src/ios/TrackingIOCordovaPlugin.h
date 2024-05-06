@@ -4,6 +4,8 @@
 
 @property (nonatomic, strong, nullable) NSString *IDFA;
 
+- (void)getIDFV:(CDVInvokedUrlCommand *_Nonnull)command;
+- (void)getASAToken:(CDVInvokedUrlCommand *_Nonnull)command;
 - (void)setDebugMode:(CDVInvokedUrlCommand *_Nonnull)command;
 - (void)getDeviceId:(CDVInvokedUrlCommand *_Nonnull)command;
 - (void)getOAID:(CDVInvokedUrlCommand *_Nonnull)command;

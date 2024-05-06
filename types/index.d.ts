@@ -26,10 +26,22 @@ declare namespace Tracking {
     function getDeviceId(): Promise<string>;
     
     /**
-     * 获取 oaid
+     * 获取 oaid (ios 为 idfa)
      * @example const uuid = await Tracking.getOAID();
      */
     function getOAID(): Promise<string>;
+
+    /**
+     * 获取 idfv (ios Only)
+     * @example const uuid = await Tracking.getOAID();
+     */
+    function getIDFV(): Promise<string>;
+
+    /**
+     * 获取 ASAToken (ios Only)
+     * @example const uuid = await Tracking.getOAID();
+     */
+    function getASAToken(): Promise<string>;
 
     /**
      * 初始化内置Oaid sdk，为了应对有个性化推荐弹窗的手机，提前先调用一遍oaid sdk，延后调用热云sdk的初始化。

@@ -25,6 +25,26 @@ module.exports = {
         });
     },
 
+    getIDFV() {
+        return new Promise(function (resolve, reject) {
+            exec(function (res) {
+                resolve(res);
+            }, function (err) {
+                reject(err);
+            }, 'Tracking', 'getIDFV', []);
+        });
+    },
+    
+    getASAToken() {
+        return new Promise(function (resolve, reject) {
+            exec(function (res) {
+                resolve(res);
+            }, function (err) {
+                reject(err);
+            }, 'Tracking', 'getASAToken', []);
+        });
+    },
+
     initOaidSdk(onSuccess, onError) {
         exec(onSuccess, onError, 'Tracking', 'initOaidSdk', []);
     },
