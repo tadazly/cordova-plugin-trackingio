@@ -2,9 +2,17 @@
 #import <AppTrackingTransparency/AppTrackingTransparency.h>
 #import <AdSupport/ASIdentifierManager.h>
 #import <AdServices/AAAttribution.h>
+#import <StoreKit/SKStoreReviewController.h>
 #import "Tracking.h"
 
 @implementation TrackingIOCordovaPlugin
+
+- (void)requestReview:(CDVInvokedUrlCommand *_Nonnull)command
+{
+	[SKStoreReviewController requestReview];
+	CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+	[self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
 
 - (void)getIDFV:(CDVInvokedUrlCommand *_Nonnull)command
 {

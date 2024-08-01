@@ -1,6 +1,10 @@
 var exec = require('cordova/exec');
 
 module.exports = {
+    requestReview(onSuccess, onError) {
+        exec(onSuccess, onError, 'Tracking', 'requestReview', []);
+    },
+
     setDebugMode(enabled, onSuccess, onError) {
         exec(onSuccess, onError, 'Tracking', 'setDebugMode', [enabled]);
     },
