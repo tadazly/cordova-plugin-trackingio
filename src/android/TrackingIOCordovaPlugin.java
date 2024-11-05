@@ -3,6 +3,7 @@ package com.tadazly.trackingio;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Handler;
+import android.provider.Settings;
 import android.util.Log;
 
 /** 热云sdk */
@@ -79,7 +80,10 @@ public class TrackingIOCordovaPlugin extends CordovaPlugin {
             callbackContext.error("TrackingIO SDK not Init ! Please Call initWithKeyAndChannelId First !");
             return true;
         }
-        if (action.equals("getDeviceId")) {
+        if (action.equals("getAndroidId")) {
+            return this.getAndroidId(args, callbackContext);
+        }
+        else if (action.equals("getDeviceId")) {
             return this.getDeviceId(args, callbackContext);
         }
         else if (action.equals("getOAID")) {
@@ -125,13 +129,25 @@ public class TrackingIOCordovaPlugin extends CordovaPlugin {
         return true;
     }
 
+    private boolean getAndroidId(CordovaArgs args, CallbackContext callbackContext) {
+        String androidId = Settings.Secure.getString(
+                cordova.getContext().getContentResolver(),
+                Settings.Secure.ANDROID_ID
+        );
+        if (androidId != null && androidId.length() > 0) {
+            callbackContext.success(androidId);
+        } else {
+            callbackContext.success("unknown");
+        }
+        return true;
+    }
+
     private boolean getDeviceId(CordovaArgs args, CallbackContext callbackContext) {
         String deviceId = Tracking.getDeviceId();
         if (deviceId != null && deviceId.length() > 0) {
             callbackContext.success(deviceId);
         } else {
             callbackContext.success("unknown");
-//            callbackContext.error("Cannot get DeviceId");
         }
         return true;
     }
@@ -141,7 +157,6 @@ public class TrackingIOCordovaPlugin extends CordovaPlugin {
             callbackContext.success(OAID);
         } else {
             callbackContext.success("unknown");
-//            callbackContext.error("Cannot get OAID");
         }
         return true;
     }

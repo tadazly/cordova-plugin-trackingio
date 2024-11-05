@@ -19,6 +19,11 @@ declare namespace Tracking {
     function setDebugMode(enabled: boolean): void;
 
     /**
+     * 获取 ANDROID_ID
+     */
+    function getAndroidId(): Promise<string>;
+
+    /**
      * 如果开发者没有自己的用户系统，希望使用用户设备ID作为accountId，直接调用Tracking.getDeviceId()方法获取设备ID即可。
      * 该方法一定要在调用初始化接口之后间隔5s以上再使用，否则会影响取值。
      * @example const uuid = await Tracking.getDeviceId();

@@ -9,6 +9,16 @@ module.exports = {
         exec(onSuccess, onError, 'Tracking', 'setDebugMode', [enabled]);
     },
 
+    getAndroidId() {
+        return new Promise(function (resolve, reject) {
+            exec(function (res) {
+                resolve(res);
+            }, function (err) {
+                reject(err);
+            }, 'Tracking', 'getAndroidId', []);
+        });
+    },
+
     getDeviceId() {
         return new Promise(function (resolve, reject) {
             exec(function (res) {
